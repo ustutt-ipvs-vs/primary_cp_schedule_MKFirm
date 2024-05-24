@@ -1,4 +1,5 @@
 import json
+import math
 from dataclasses import dataclass
 from typing import List
 
@@ -25,8 +26,8 @@ class Stream:
 
 @dataclass
 class Scenario:
-
     streams: List[Stream]
+    hyper_cycle: int
 
     def __init__(self, scenario_path):
         self.streams = []
@@ -34,3 +35,7 @@ class Scenario:
             # create stream objects
             for _, json_stream in json.load(scenario_file).items():
                 self.streams.append(Stream(json_stream))
+
+    def __post_init__(self):
+        periods = set([stream.cycle_time_ns for stream in self.streams])
+        self.hyper_cycle = math.lcm(*periods)

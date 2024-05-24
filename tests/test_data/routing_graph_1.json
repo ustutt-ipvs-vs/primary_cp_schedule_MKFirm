@@ -1,0 +1,243 @@
+{
+  "directed": true,
+  "multigraph": true,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "0",
+      "processing_delay_ns": 0,
+      "is_switch": false,
+      "queues_per_port": 8
+    },
+    {
+      "id": "1",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "2",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "3",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "4",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "5",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "6",
+      "processing_delay_ns": 4000,
+      "is_switch": true,
+      "queues_per_port": 8
+    },
+    {
+      "id": "7",
+      "processing_delay_ns": 0,
+      "is_switch": false,
+      "queues_per_port": 8
+    },
+    {
+      "id": "8",
+      "processing_delay_ns": 0,
+      "is_switch": false,
+      "queues_per_port": 8
+    },
+    {
+      "id": "9",
+      "processing_delay_ns": 0,
+      "is_switch": false,
+      "queues_per_port": 8
+    },
+    {
+      "id": "10",
+      "processing_delay_ns": 0,
+      "is_switch": false,
+      "queues_per_port": 8
+    }
+  ],
+  "links": [
+    {
+      "key": "0-1",
+      "source": "0",
+      "target": "1",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "1-0",
+      "source": "1",
+      "target": "0",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "1-2",
+      "source": "1",
+      "target": "2",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "1-3",
+      "source": "1",
+      "target": "3",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "1-4",
+      "source": "1",
+      "target": "4",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "1-10",
+      "source": "1",
+      "target": "10",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "2-1",
+      "source": "2",
+      "target": "1",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "2-6",
+      "source": "2",
+      "target": "6",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "2-9",
+      "source": "2",
+      "target": "9",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "3-1",
+      "source": "3",
+      "target": "1",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "3-6",
+      "source": "3",
+      "target": "6",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "4-1",
+      "source": "4",
+      "target": "1",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "4-5",
+      "source": "4",
+      "target": "5",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "5-4",
+      "source": "5",
+      "target": "4",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "5-6",
+      "source": "5",
+      "target": "6",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "6-2",
+      "source": "6",
+      "target": "2",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "6-3",
+      "source": "6",
+      "target": "3",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "6-5",
+      "source": "6",
+      "target": "5",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "6-7",
+      "source": "6",
+      "target": "7",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "6-8",
+      "source": "6",
+      "target": "8",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "7-6",
+      "source": "7",
+      "target": "6",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "8-6",
+      "source": "8",
+      "target": "6",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "9-2",
+      "source": "9",
+      "target": "2",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    },
+    {
+      "key": "10-1",
+      "source": "10",
+      "target": "1",
+      "link_speed_mbps": 100,
+      "propagation_delay_ns": 50
+    }
+  ]
+}

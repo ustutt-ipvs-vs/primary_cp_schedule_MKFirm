@@ -1,54 +1,30 @@
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Any
+
+from network.network_elements import EgressPort
+from network.network_graph import NetworkGraph
+from scenario.scenario import Scenario
 
 
 @dataclass
 class CpParameters:
     """Parameters for the constraint programming model."""
-    scenario: Any
-    routes: Dict[int, List[List[Tuple[int, int]]]]
+    network: NetworkGraph
+    scenario: Scenario
+    routes: Dict[str, List[EgressPort]]
+
     timeout: int
     threads: int
     verbose: bool
     raw_output: bool
-    optimize_traffic: bool
-    zero_queuing: bool
-    hyper_cycle_deadline: bool
-    hyper_cycle: int = 0
-
-    def __post_init__(self):
-        self.hyper_cycle = self.scenario['config_info']['hyper_cycle']
 
 
 @dataclass
-class CpState:
-    # solution object
-    mdl_sol: Any = None
+class CpVariables:
+    """Variables for the constraint programming model."""
+    pcp: Dict[str, Any]  # int variable for the streams pcp value
+    transmission_windows: Dict[str, List[Any]]  # key: egress_port, value: interval variables
+    queuing: Dict[str, List[List[Any]]]  # key: egress_port, value: list for each queue (pcp), in list: list of interval variables
 
-    # scenario content
-    time_step: int = 0
-    flow_ids: List[int] = None
-
-    admitted: List[int] = None
-
-    # cp variables
-    # =========
-    var_admit_flows: Dict[int, Any] = None
-    var_candidate_routes: Dict[int, Any] = None
-    # network link usages
-    var_bin_link: Dict[Any, Dict[int, Any]] = None
-    var_time_per_link: Dict[int, Dict[Any, Any]] = None
-
-    def __post_init__(self):
-        if self.flow_ids is None:
-            self.flow_ids = []
-        if self.admitted is None:
-            self.admitted = []
-        if self.var_admit_flows is None:
-            self.var_admit_flows = {}
-        if self.var_candidate_routes is None:
-            self.var_candidate_routes = {}
-        if self.var_bin_link is None:
-            self.var_bin_link = {}
-        if self.var_time_per_link is None:
-            self.var_time_per_link = {}
+    def __init__(self, network: NetworkGraph, scenario: Scenario, routes: Dict[str, List[EgressPort]]):
+        pass

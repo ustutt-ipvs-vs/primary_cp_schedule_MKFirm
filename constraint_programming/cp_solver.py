@@ -5,45 +5,14 @@ from docplex.cp.model import *
 
 import Util
 from ResultStruct import ResultStruct
-from constraint_programming.cp_structs import CpParameters, CpState
+from constraint_programming.cp_structs import CpParameters, CpVariables
 
 
 def solve_scheduling(parameters: CpParameters) -> List[ResultStruct]:
-    result_list: List[ResultStruct] = []
 
-    flow_attributes = Util.get_flow_attributes(scenario=parameters.scenario['time_steps'])
-    cluster_mapping = Util.get_cluster_mapping(scenario=parameters.scenario['time_steps'])
+    # create variables
+    var = CpVariables()
 
-    state = CpState()
-
-    for time_step in parameters.scenario['time_steps']:
-        offensive_state_copy = copy.deepcopy(state)
-
-        # defensive planning
-        if parameters.verbose:
-            print("running defensive planning")
-        defensive_result = defensive_planning(parameters, state, time_step, flow_attributes, cluster_mapping)
-        temp_result = defensive_result
-
-        # offensive_planning if needed
-        if defensive_result.flows_admitted < defensive_result.flows_total and state.time_step > 0:
-            if parameters.verbose:
-                print("running offensive planning")
-            # TODO ensure the old ones are covered!
-            offensive_result = offensive_planning(parameters, offensive_state_copy, time_step, flow_attributes,
-                                                  cluster_mapping)
-
-            if defensive_result.flows_admitted <= offensive_result.flows_admitted:
-                state = offensive_state_copy
-                temp_result = offensive_result
-
-        state.admitted = temp_result.admitted_streams
-
-        state.time_step += 1
-        result_list.append(temp_result)
-
-    # end of time step
-    return result_list
 
 
 def plain_planning(parameters: CpParameters, state: CpState, time_step, start_model_building_time,

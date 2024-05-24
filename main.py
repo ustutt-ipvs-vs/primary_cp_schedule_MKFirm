@@ -1,5 +1,4 @@
 import argparse
-import json
 
 import Routing
 from constraint_programming import cp_solver, cp_structs

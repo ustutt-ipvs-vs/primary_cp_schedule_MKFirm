@@ -34,7 +34,7 @@ class NetworkGraph:
                 self.nodes[egress_port.host_node].ports.append(egress_port)
 
     def get_node_ids(self):
-        return self.nodes.keys()
+        return list(self.nodes.keys())
 
     def get_node(self, node_id: str) -> NetworkNode:
         return self.nodes[node_id]
