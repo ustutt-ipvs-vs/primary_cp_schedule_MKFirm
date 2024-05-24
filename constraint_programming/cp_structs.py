@@ -48,8 +48,8 @@ class CpVariables:
         for stream in scenario.streams:
             # create pcp variable
             # TODO pcp ranges from 0 to 7, however, we have a specific field for the number of queues in each network device. Can wi simply assume that we always have 8 queues? -> if yes, we can use the cplex integer_var_dict
-            # max = 6, so that pcp=7 is free for emergency traffic
-            self.pcp[stream.id] = expression.integer_var(0, 6, name=f"pcp_{stream.id}")
+            # queues_available - 1, because highest queue for ET traffic
+            self.pcp[stream.id] = expression.integer_var(0, network.min_queues_available - 1, name=f"pcp_{stream.id}")
 
             # create transmission_window and queuing variables
             for egress_port in routes[stream.id]:
@@ -63,24 +63,26 @@ class CpVariables:
                             end=(release_time, deadline),  # todo make the bound tighter
                             size=egress_port.calculate_transmission_delay_in_ns_of(stream),
                             optional=False,
-                            name='transmission_stream_{}_frame_{}'.format(stream.id, frame)
+                            name='transmission_port_{}_stream_{}_frame_{}'.format(egress_port.id, stream.id, frame)
                         ))
-                    for queue in range(0, 6):
+                    for queue in range(0, network.min_queues_available):
                         self.queuing[egress_port.id][queue].append(
                             expression.interval_var(
                                 start=(release_time, deadline),  # todo make the bound tighter
                                 end=(release_time, deadline),  # todo make the bound tighter
                                 optional=True,
-                                name='queuing_stream_{}_frame_{}_queue_{}'.format(stream.id, frame, queue)
+                                name='queuing_port_{}_stream_{}_frame_{}_queue_{}'.format(egress_port.id, stream.id,
+                                                                                          frame, queue)
                             ))
 
     def get_transmission_var(self, hop: EgressPort, stream: Stream, frame: int):
         return next((v for v in self.transmission_windows[hop.id] if
-                     v.name == 'transmission_stream_{}_frame_{}'.format(stream.id, frame)), None)
+                     v.name == 'transmission_port_{}_stream_{}_frame_{}'.format(hop.id, stream.id, frame)), None)
 
     def get_queuing_var(self, hop: EgressPort, stream: Stream, frame: int, queue: int):
         return next((v for v in self.queuing[hop.id][queue] if
-                     v.name == 'queuing_stream_{}_frame_{}_queue_{}'.format(stream.id, frame, queue)), None)
+                     v.name == 'queuing_port_{}_stream_{}_frame_{}_queue_{}'.format(hop.id, stream.id, frame, queue)),
+                    None)
 
     def get_pcp_var(self, stream: Stream):
         return self.pcp[stream.id]

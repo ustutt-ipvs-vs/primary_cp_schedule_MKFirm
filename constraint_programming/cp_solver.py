@@ -44,16 +44,17 @@ def create_single_stream_constraints(mdl: CpoModel, var: CpVariables, param: CpP
                 last_hop: EgressPort = param.routes[stream.id][hop - 1]
                 current_hop: EgressPort = param.routes[stream.id][hop]
                 processing_delay: int = param.network.get_node(last_hop.host_node).processing_delay_ns
-                mdl.add_constraint(end_before_start(var.transmission_windows[last_hop.id][frame],
-                                                    var.transmission_windows[current_hop.id][frame],
+                last_hop_var = var.get_transmission_var(last_hop, stream, frame)
+                current_hop_var = var.get_transmission_var(current_hop, stream, frame)
+                mdl.add_constraint(end_before_start(last_hop_var, current_hop_var,
                                                     delay=processing_delay + last_hop.propagation_delay_ns))
 
         # zero jitter constraint
         last_egress_port = param.routes[stream.id][-1]
         for frame in range(1, Util.get_frames_per_hc(stream, param.scenario.hyper_cycle)):
-            mdl.add_constraint(end_at_end(var.transmission_windows[last_egress_port.id][frame - 1],
-                                          var.transmission_windows[last_egress_port.id][frame],
-                                          delay=stream.cycle_time_ns))
+            last_frame_var = var.get_transmission_var(last_egress_port, stream, frame - 1)
+            current_frame_var = var.get_transmission_var(last_egress_port, stream, frame)
+            mdl.add_constraint(end_at_end(last_frame_var, current_frame_var, delay=stream.cycle_time_ns))
 
 
 def create_transmission_isolation_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
@@ -120,8 +121,8 @@ def create_constraints_linking_queuing_to_transmission(mdl: CpoModel, var: CpVar
                         # queuing ends with the end of the current transmission
                         mdl.add_constraint(end_at_end(queuing_var, current_transmission))
 
-                previous_hop = current_hop
                 # end of queue loop
+            previous_hop = current_hop
             # end of frame loop
         # end of hop loop
     # end of stream loop
@@ -139,7 +140,7 @@ def create_constraints_linking_pcp_to_queuing(mdl: CpoModel, var: CpVariables, p
 
                     if queuing_var is not None:
                         # if the pcp is equal to the queue, the queuing must be present
-                        mdl.add_constraint(logical_and(pcp_var == queue, presence_of(queuing_var)))
+                        mdl.add_constraint(if_then(pcp_var == queue, presence_of(queuing_var)))
 
 
 def planning(mdl: CpoModel, param: CpParameters):

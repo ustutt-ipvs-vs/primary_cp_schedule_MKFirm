@@ -5,6 +5,7 @@ from network.network_elements import NetworkNode, EgressPort
 
 class NetworkGraph:
     nodes: Dict[str, NetworkNode]
+    min_queues_available: int
 
     def __init__(self, network_file_path: str):
         self.nodes = {}
@@ -26,6 +27,9 @@ class NetworkGraph:
             for link in topology_json['links']:
                 egress_port = EgressPort(link)
                 self.nodes[egress_port.host_node].ports.append(egress_port)
+
+            # todo this will globally limit the number of queues used. Is this simplification fine? Practically, all devices should have 8 queues...?
+            self.min_queues_available = min([node.queues_per_port for node in self.nodes.values()])
 
     def get_node_ids(self):
         return list(self.nodes.keys())
