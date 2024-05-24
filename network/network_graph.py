@@ -4,7 +4,6 @@ from network.network_elements import NetworkNode, EgressPort
 
 
 class NetworkGraph:
-
     nodes: Dict[str, NetworkNode]
 
     def __init__(self, network_file_path: str):
@@ -25,12 +24,7 @@ class NetworkGraph:
 
             # load links and create egress ports
             for link in topology_json['links']:
-                egress_port = EgressPort(link['key'])
-                egress_port.host_node = link['source']
-                egress_port.destination_node = link['target']
-                egress_port.link_speed_mbps = int(link['link_speed_mbps'])
-                egress_port.propagation_delay_ns = int(link['propagation_delay_ns'])
-
+                egress_port = EgressPort(link)
                 self.nodes[egress_port.host_node].ports.append(egress_port)
 
     def get_node_ids(self):

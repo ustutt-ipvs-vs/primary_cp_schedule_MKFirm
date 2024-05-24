@@ -5,19 +5,10 @@ from network.network_graph import NetworkGraph
 from network.network_elements import EgressPort
 from scenario.scenario import Scenario
 
-import Util
-
-
-def calculate_transmission_delay_in_ns(frame_size: int, link_speed: int) -> int:
-    # Byte / (MByte/s) -> s
-    # = Byte / (10^6 * Byte/s) ->
-    # for ns: * 10^9 = 10^3 * Byte / (MByte/s)
-    return int(frame_size * 10 ** 3 / link_speed)
-
 
 def calculate_hop_delay_in_ns(network: NetworkGraph, egress_port: EgressPort, frame_size: int) -> int:
     return (egress_port.propagation_delay_ns +
-            calculate_transmission_delay_in_ns(frame_size, egress_port.link_speed_mbps) +
+            egress_port.calculate_transmission_delay_in_ns_of(frame_size) +
             network.get_node(egress_port.destination_node).processing_delay_ns)
 
 

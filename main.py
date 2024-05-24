@@ -26,9 +26,8 @@ scenario = Scenario(args.scenario)
 candidate_routes = Routing.compute_candidate_routes(network=network, scenario=scenario)
 
 timelimit = args.timelimit if args.timelimit > 0 else None
-parameters = cp_structs.CpParameters(scenario=scenario, routes=candidate_routes, timeout=timelimit,
-                                     threads=args.threads, verbose=verbose, raw_output=raw_output,
-                                     hyper_cycle_deadline=args.hyper_cycle_deadline)
-results = cp_solver.solve_scheduling(parameters)
+parameters = cp_structs.CpParameters(network=network, scenario=scenario, routes=candidate_routes, timeout=timelimit,
+                                     threads=args.threads, verbose=verbose, raw_output=raw_output)
+cp_solver.solve_scheduling(parameters)
 
 # TODO store/print results
