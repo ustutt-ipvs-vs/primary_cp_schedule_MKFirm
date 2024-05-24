@@ -47,9 +47,8 @@ class CpVariables:
         stream: Stream
         for stream in scenario.streams:
             # create pcp variable
-            # TODO pcp ranges from 0 to 7, however, we have a specific field for the number of queues in each network device. Can wi simply assume that we always have 8 queues? -> if yes, we can use the cplex integer_var_dict
-            # queues_available - 1, because highest queue for ET traffic
-            self.pcp[stream.id] = expression.integer_var(0, network.min_queues_available - 1, name=f"pcp_{stream.id}")
+            # queues_available - 2, because we start with 0 and the highest queue is reserved for ET traffic
+            self.pcp[stream.id] = expression.integer_var(0, network.min_queues_available - 2, name=f"pcp_{stream.id}")
 
             # create transmission_window and queuing variables
             for egress_port in routes[stream.id]:
@@ -65,7 +64,7 @@ class CpVariables:
                             optional=False,
                             name='transmission_port_{}_stream_{}_frame_{}'.format(egress_port.id, stream.id, frame)
                         ))
-                    for queue in range(0, network.min_queues_available):
+                    for queue in range(0, network.min_queues_available - 1):
                         self.queuing[egress_port.id][queue].append(
                             expression.interval_var(
                                 start=(release_time, deadline),  # todo make the bound tighter

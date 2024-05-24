@@ -24,7 +24,8 @@ def solve_scheduling(parameters: CpParameters):
     create_constraints_linking_pcp_to_queuing(mdl, var, parameters)
 
     # call the actual planning
-    planning(mdl, parameters)
+    result = planning(mdl, parameters)
+    return result
 
 
 def create_single_stream_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
@@ -163,3 +164,5 @@ def planning(mdl: CpoModel, param: CpParameters):
     if param.verbose:
         mdl_sol.print_solution()
         print("Solving time: ", end_solving_time - start_solving_time)
+
+    return mdl_sol
