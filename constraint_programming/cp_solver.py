@@ -1,11 +1,6 @@
-from typing import Any
-
-from parse import parse
-import numpy as np
 from docplex.cp.model import *
 
 import Util
-from ResultStruct import ResultStruct
 from constraint_programming.cp_structs import CpParameters, CpVariables
 from network.network_elements import EgressPort, NetworkNode
 from scenario.scenario import Stream
