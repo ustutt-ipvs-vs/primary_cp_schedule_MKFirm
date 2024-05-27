@@ -1,5 +1,3 @@
-import json
-
 from docplex.cp.model import *
 
 from Util import iterate_frames_per_hc
@@ -17,7 +15,7 @@ def write_result_to_json(cp_result: CpoSolveResult, parameters: CpParameters, ou
                        'pcp': int(cp_result[f"pcp_{stream.id}"])}
         frame_list = []
         for frame in iterate_frames_per_hc(stream, parameters.scenario.hyper_cycle):
-            frame_dict = {'id': frame,
+            frame_dict = {'frame_number': frame,
                           'transmissions': []}
             transmissions = []
             for egress_port in parameters.routes[stream.id]:

@@ -31,4 +31,4 @@ parameters = cp_structs.CpParameters(network=network, scenario=scenario, routes=
                                      threads=args.threads, verbose=verbose, raw_output=raw_output)
 result = cp_solver.solve_scheduling(parameters)
 
-write_result_to_json(result, parameters, 'output.json')
+write_result_to_json(result, parameters, 'transmission_output.json')
