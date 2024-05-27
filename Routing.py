@@ -12,8 +12,8 @@ def calculate_hop_delay_in_ns(network: NetworkGraph, egress_port: EgressPort, fr
             network.get_node(egress_port.destination_node).processing_delay_ns)
 
 
-def get_dijkstra_shortest_path(source: str, destination: str, network: NetworkGraph, frame_size: int) -> List[
-    EgressPort]:
+def get_dijkstra_shortest_path(source: str, destination: str, network: NetworkGraph, frame_size: int) \
+        -> List[EgressPort]:
     egress_port_from_predecessor: Dict[str, EgressPort] = {}
 
     # holds distance, node tuples. This ordering, since it is ordered by the first entry first
@@ -55,7 +55,7 @@ def get_dijkstra_shortest_path(source: str, destination: str, network: NetworkGr
     # end of frontier_queue loop
 
     if frontier_distances[destination] == sys.maxsize:
-        print("No path found from " + source + " to " + destination)
+        raise Exception("No path found from " + source + " to " + destination)
 
     # extract path
     path: List[EgressPort] = []
