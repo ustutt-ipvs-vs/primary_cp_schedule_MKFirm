@@ -18,6 +18,8 @@ def solve_scheduling(parameters: CpParameters):
     create_constraints_linking_queuing_to_transmission(mdl, var, parameters)
     create_constraints_linking_pcp_to_queuing(mdl, var, parameters)
 
+    optimization_goal(mdl, var, parameters)
+
     # call the actual planning
     result = planning(mdl, parameters)
 
@@ -128,6 +130,25 @@ def create_constraints_linking_pcp_to_queuing(mdl: CpoModel, var: CpVariables, p
                     if queuing_var is not None:
                         # if the pcp is equal to the queue, the queuing must be present
                         mdl.add_constraint(if_then(pcp_var == queue, presence_of(queuing_var)))
+
+
+def optimization_goal(mdl: CpoModel, var: CpVariables, param: CpParameters):
+    """
+    Minimize the maximum end-to-end delay.
+    Note that it is fine to minmax the e2e delay for the first frame of each stream, since we have a zero-jitter constraint.
+    """
+    end_to_end_delays = []
+    for stream in param.scenario.streams:
+        first_hop = param.routes[stream.id][0]
+        last_hop = param.routes[stream.id][-1]
+        first_transmission = var.get_transmission_var(hop=first_hop, stream=stream, frame=0)
+        last_transmission = var.get_transmission_var(hop=last_hop, stream=stream, frame=0)
+        end_to_end = interval_var(start=first_transmission.start, end=last_transmission.end, optional=False,
+                                  name="end_to_end_delay_stream_{}".format(stream.id))
+        mdl.add_constraint(span(end_to_end, [first_transmission, last_transmission]))
+        end_to_end_delays.append(end_to_end)
+
+    mdl.minimize(max([length_of(v) for v in end_to_end_delays]))
 
 
 def planning(mdl: CpoModel, param: CpParameters):
