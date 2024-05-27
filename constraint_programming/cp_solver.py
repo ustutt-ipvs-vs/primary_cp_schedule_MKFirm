@@ -6,7 +6,7 @@ from network.network_elements import EgressPort, NetworkNode
 from scenario.scenario import Stream
 
 
-def solve_scheduling(parameters: CpParameters):
+def solve_scheduling(parameters: CpParameters) -> CpoSolveResult:
     # create variables
     var = CpVariables(parameters.network, parameters.scenario, parameters.routes)
 
@@ -151,7 +151,7 @@ def optimization_goal(mdl: CpoModel, var: CpVariables, param: CpParameters):
     mdl.minimize(max([length_of(v) for v in end_to_end_delays]))
 
 
-def planning(mdl: CpoModel, param: CpParameters):
+def planning(mdl: CpoModel, param: CpParameters) -> CpoSolveResult:
     start_solving_time = time.time()
 
     if param.verbose:

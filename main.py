@@ -2,6 +2,7 @@ import argparse
 
 import Routing
 from constraint_programming import cp_solver, cp_structs
+from constraint_programming.cp_output_writer import write_result_to_json
 from network.network_graph import NetworkGraph
 from scenario.scenario import Scenario
 
@@ -28,6 +29,6 @@ candidate_routes = Routing.compute_candidate_routes(network=network, scenario=sc
 timelimit = args.timelimit if args.timelimit > 0 else None
 parameters = cp_structs.CpParameters(network=network, scenario=scenario, routes=candidate_routes, timeout=timelimit,
                                      threads=args.threads, verbose=verbose, raw_output=raw_output)
-cp_solver.solve_scheduling(parameters)
+result = cp_solver.solve_scheduling(parameters)
 
-# TODO store/print results
+write_result_to_json(result, parameters, 'output.json')
