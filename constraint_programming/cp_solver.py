@@ -20,6 +20,7 @@ def solve_scheduling(parameters: CpParameters):
 
     # call the actual planning
     result = planning(mdl, parameters)
+
     return result
 
 
@@ -62,26 +63,16 @@ def create_transmission_isolation_constraints(mdl: CpoModel, var: CpVariables, p
     for node in param.network.nodes.values():
         for egress_port in node.ports:
 
-            # TODO handle inter-frame gap
-            variables = var.transmission_windows[egress_port.id]
+            # transmissions and inter-frame gaps cannot overlap
+            variables = var.transmission_windows[egress_port.id] + list(var.inter_frame_gaps[egress_port.id].values())
             if len(variables) > 1:
                 mdl.add_constraint(no_overlap(variables))
 
-            '''
-            # no overlap with inter-frame gap
-            for transmission_a, transmission_b in [(a, b) for i, a in
-                                                   enumerate(var.transmission_windows[egress_port.id]) for j, b in
-                                                   enumerate(var.transmission_windows[egress_port.id]) if i != j]:
-                # if_then doesn't work with end_before_start
-                mdl.add_constraint(
-                    if_then(transmission_a.start <= transmission_b.start,
-                            end_before_start(transmission_a, transmission_b, delay=egress_port.get_inter_frame_gap()))
-                )
-                mdl.add_constraint(
-                    if_then(transmission_a.start > transmission_b.start,
-                            end_before_start(transmission_b, transmission_a, delay=egress_port.get_inter_frame_gap()))
-                )
-                '''
+            # connect transmission and inter-frame gap, i.e., after each transmission directly follows the according ifg
+            for transmission in var.transmission_windows[egress_port.id]:
+                if transmission.name in var.inter_frame_gaps[egress_port.id]:
+                    mdl.add_constraint(
+                        end_at_start(transmission, var.inter_frame_gaps[egress_port.id][transmission.name]))
 
 
 def create_queuing_isolation_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
