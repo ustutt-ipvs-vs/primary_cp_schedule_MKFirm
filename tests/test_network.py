@@ -1,6 +1,8 @@
 import unittest
 
+from network.network_elements import EgressPort
 from network.network_graph import NetworkGraph
+from scenario.scenario import Stream
 
 
 class TestNetwork(unittest.TestCase):
@@ -17,6 +19,7 @@ class TestNetwork(unittest.TestCase):
 
             for port in switch.ports:
                 self.assertTrue(int(port.destination_node) in connected_nodes)
+                self.assertEqual(port.get_inter_frame_gap(), 960)
 
     def test_network_loading(self):
         network: NetworkGraph = NetworkGraph("test_data/routing_graph_1.json")
@@ -43,3 +46,32 @@ class TestNetwork(unittest.TestCase):
         }
 
         self.check_network_Devices(network, end_devices, False)
+
+    def test_transmission_delay(self):
+        e1: EgressPort = EgressPort(None)
+        e1.link_speed_mbps = 1000
+        self.assertEqual(e1.calculate_transmission_delay_in_ns_of(12), 96)
+        self.assertEqual(e1.calculate_transmission_delay_in_ns_of(125), 1000)
+
+        e2: EgressPort = EgressPort(None)
+        e2.link_speed_mbps = 100
+        self.assertEqual(e2.calculate_transmission_delay_in_ns_of(12), 960)
+        self.assertEqual(e2.calculate_transmission_delay_in_ns_of(125), 10000)
+
+        e3: EgressPort = EgressPort(None)
+        e3.link_speed_mbps = 0
+        self.assertRaises(ZeroDivisionError, e3.calculate_transmission_delay_in_ns_of, 12)
+
+        s1: Stream = Stream(None)
+        s1.frame_size_B = 250
+        self.assertEqual(e1.calculate_transmission_delay_in_ns_of(s1), 2000)
+        self.assertEqual(e2.calculate_transmission_delay_in_ns_of(s1), 20000)
+        self.assertRaises(ZeroDivisionError, e3.calculate_transmission_delay_in_ns_of, s1)
+
+        s2: Stream = Stream(None)
+        s2.frame_size_B = 1500
+        self.assertEqual(e1.calculate_transmission_delay_in_ns_of(s2), 12000)
+        self.assertEqual(e2.calculate_transmission_delay_in_ns_of(s2), 120000)
+
+        self.assertRaises(ValueError, e3.calculate_transmission_delay_in_ns_of, {})
+

@@ -17,14 +17,14 @@ class EgressPort:
     inter_frame_gap: int
 
     def __init__(self, json_link):
+        if json_link is not None:
+            self.id = json_link['key']
+            self.host_node = json_link['source']
+            self.destination_node = json_link['target']
+            self.link_speed_mbps = int(json_link['link_speed_mbps'])
+            self.propagation_delay_ns = int(json_link['propagation_delay_ns'])
 
-        self.id = json_link['key']
-        self.host_node = json_link['source']
-        self.destination_node = json_link['target']
-        self.link_speed_mbps = int(json_link['link_speed_mbps'])
-        self.propagation_delay_ns = int(json_link['propagation_delay_ns'])
-
-        self.inter_frame_gap = self.calculate_transmission_delay_in_ns_of(12)
+            self.inter_frame_gap = self.calculate_transmission_delay_in_ns_of(12)
 
     @overload
     def calculate_transmission_delay_in_ns_of(self, stream: Stream) -> int:
