@@ -12,7 +12,8 @@ def solve_scheduling(parameters: CpParameters) -> CpoSolveResult:
 
     mdl = CpoModel()
     # create constraints
-    create_single_stream_constraints(mdl, var, parameters)
+    create_link_precedence_constraints(mdl, var, parameters)
+    create_zero_jitter_constraints(mdl, var, parameters)
     create_transmission_isolation_constraints(mdl, var, parameters)
     create_queuing_isolation_constraints(mdl, var, parameters)
     create_constraints_linking_queuing_to_transmission(mdl, var, parameters)
@@ -26,13 +27,7 @@ def solve_scheduling(parameters: CpParameters) -> CpoSolveResult:
     return result
 
 
-def create_single_stream_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
-    """
-    Create constraints concerning single streams:
-    - link precedence constraints
-    - zero jitter constraints
-    """
-
+def create_link_precedence_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
     stream: Stream
     for stream in param.scenario.streams:
 
@@ -48,7 +43,12 @@ def create_single_stream_constraints(mdl: CpoModel, var: CpVariables, param: CpP
                 mdl.add_constraint(end_before_start(last_hop_var, current_hop_var,
                                                     delay=processing_delay + last_hop.propagation_delay_ns))
 
-        # zero jitter constraint
+
+def create_zero_jitter_constraints(mdl: CpoModel, var: CpVariables, param: CpParameters):
+    # zero jitter constraint
+    # TODO consider removing, or adding a zero-jitter constraint for the first hop or each hop...
+    stream: Stream
+    for stream in param.scenario.streams:
         last_egress_port = param.routes[stream.id][-1]
         for frame in range(1, Util.get_frames_per_hc(stream, param.scenario.hyper_cycle)):
             last_frame_var = var.get_transmission_var(last_egress_port, stream, frame - 1)
