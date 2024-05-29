@@ -20,6 +20,7 @@ class TestNetwork(unittest.TestCase):
             for port in switch.ports:
                 self.assertTrue(int(port.destination_node) in connected_nodes)
                 self.assertEqual(port.get_inter_frame_gap(), 960)
+                self.assertEqual(port.propagation_delay_ns, 50)
 
     def test_network_loading(self):
         network: NetworkGraph = NetworkGraph("test_data/routing_graph_1.json")
