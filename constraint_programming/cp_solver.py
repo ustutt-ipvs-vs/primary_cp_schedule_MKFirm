@@ -21,6 +21,9 @@ def solve_scheduling(parameters: CpParameters) -> CpoSolveResult:
 
     optimization_goal(mdl, var, parameters)
 
+    # print model
+    # mdl.export_model("model.txt")
+
     # call the actual planning
     result = planning(mdl, parameters)
 
