@@ -33,4 +33,4 @@ def write_result_to_json(cp_result: CpoSolveResult, parameters: CpParameters, ou
     # end of stream loop
 
     with open(output_file, 'w') as file:
-        json.dump(output, file)
+        json.dump(output, file, indent=4)
