@@ -1,5 +1,5 @@
 import argparse
-
+import os
 import Routing
 from constraint_programming import cp_solver, cp_structs
 from constraint_programming.cp_output_writer import write_result_to_json
@@ -16,6 +16,7 @@ parser.add_argument("-v", "--verbose", help="print a lot of debug outputs. Is ov
                     action='store_true')
 parser.add_argument("--raw-output", help="If set, the output will be in a raw format. Overwrites the verbose flag.",
                     action='store_true')
+parser.add_argument("-o", "--output", type=str, help="Path to the output file", default='transmission_output.json')
 
 args = parser.parse_args()
 raw_output = args.raw_output
@@ -31,4 +32,6 @@ parameters = cp_structs.CpParameters(network=network, scenario=scenario, routes=
                                      threads=args.threads, verbose=verbose, raw_output=raw_output)
 result = cp_solver.solve_scheduling(parameters)
 
-write_result_to_json(result, parameters, 'transmission_output.json')
+if '/' in str(args.output) and not os.path.isdir(os.path.basename(args.output)):
+    os.makedirs(os.path.basename(args.output), exist_ok=True)
+write_result_to_json(result, parameters, args.output)
