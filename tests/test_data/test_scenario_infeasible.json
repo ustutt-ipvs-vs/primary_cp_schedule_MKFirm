@@ -1,0 +1,28 @@
+{
+    "0": {
+        "source": [
+            "0"
+        ],
+        "target": [
+            "3"
+        ],
+        "id": "0",
+        "properties": {},
+        "cycle_time_ns": 30000,
+        "frame_size_b": 1000,
+        "max_delay_ns": 30000
+    },
+    "1": {
+        "source": [
+            "0"
+        ],
+        "target": [
+            "3"
+        ],
+        "id": "1",
+        "properties": {},
+        "cycle_time_ns": 30000,
+        "frame_size_b": 1000,
+        "max_delay_ns": 30000
+    }
+}
