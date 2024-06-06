@@ -1,10 +1,10 @@
 import json
-from typing import List, Dict
+from typing import Dict
 from network.network_elements import NetworkNode, EgressPort
 
 
 class NetworkGraph:
-    nodes: Dict[str, NetworkNode]
+    nodes: Dict[int, NetworkNode]
     min_queues_available: int
 
     def __init__(self, network_file_path: str):
@@ -15,8 +15,8 @@ class NetworkGraph:
 
             # load nodes
             for node_json in topology_json['nodes']:
-                node = NetworkNode(node_json['id'])
-                # TODO should we use ns here or us?
+                node = NetworkNode(int(node_json['id']))
+                node.name = node_json['name']
                 node.processing_delay_ns = int(node_json['processing_delay_ns'])
                 node.queues_per_port = int(node_json['queues_per_port'])
                 node.is_switch = bool(node_json['is_switch'])
@@ -34,5 +34,5 @@ class NetworkGraph:
     def get_node_ids(self):
         return list(self.nodes.keys())
 
-    def get_node(self, node_id: str) -> NetworkNode:
+    def get_node(self, node_id: int) -> NetworkNode:
         return self.nodes[node_id]

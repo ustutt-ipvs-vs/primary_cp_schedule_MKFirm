@@ -14,7 +14,7 @@ class CpParameters:
     """Parameters for the constraint programming model."""
     network: NetworkGraph
     scenario: Scenario
-    routes: Dict[str, List[EgressPort]]
+    routes: Dict[int, List[EgressPort]]
 
     timeout: int
     threads: int
@@ -25,14 +25,14 @@ class CpParameters:
 @dataclass
 class CpVariables:
     """Variables for the constraint programming model."""
-    pcp: Dict[str, Any]  # int variable for the streams pcp value
-    transmission_windows: Dict[str, List[Any]]  # key: egress_port, value: interval variables
+    pcp: Dict[int, Any]  # int variable for the streams pcp value
+    transmission_windows: Dict[int, List[Any]]  # key: egress_port, value: interval variables
     inter_frame_gaps: Dict[
-        str, Dict[str, Any]]  # key: egress_port -> transmission, value: interval variables for inter-frame gap
+        int, Dict[int, Any]]  # key: egress_port -> transmission, value: interval variables for inter-frame gap
     queuing: Dict[
-        str, List[List[Any]]]  # key: egress_port, value: list for each queue (pcp), in list: list of interval variables
+        int, List[List[Any]]]  # key: egress_port, value: list for each queue (pcp), in list: list of interval variables
 
-    def __init__(self, network: NetworkGraph, scenario: Scenario, routes: Dict[str, List[EgressPort]]):
+    def __init__(self, network: NetworkGraph, scenario: Scenario, routes: Dict[int, List[EgressPort]]):
 
         self.transmission_windows = {}
         self.queuing = {}
@@ -58,24 +58,25 @@ class CpVariables:
             running_arrival_time = 0
             for egress_port in routes[stream.id]:
                 for frame in iterate_frames_per_hc(stream, scenario.hyper_cycle):
-                    release_time = frame * stream.cycle_time_ns + running_arrival_time
-                    deadline = release_time + stream.max_delay_ns
+                    initial_frame_release_time = frame * stream.cycle_time_ns
+                    effective_release_time = initial_frame_release_time + running_arrival_time
+                    deadline = initial_frame_release_time + stream.deadline_ns
                     '''
                     the release time and deadline bound could be made tighter by considering the no-wait time needed to
                     reach the hop, and time needed for the remaining hops. Unclear if this would speed up the solver.
                     '''
 
                     transmission_var = expression.interval_var(
-                        start=(release_time, deadline),
-                        end=(release_time, deadline),
+                        start=(effective_release_time, deadline),
+                        end=(effective_release_time, deadline),
                         size=egress_port.calculate_transmission_delay_in_ns_of(stream),
                         optional=False,
                         name='transmission_port_{}_stream_{}_frame_{}'.format(egress_port.id, stream.id, frame)
                     )
                     self.transmission_windows[egress_port.id].append(transmission_var)
                     self.inter_frame_gaps[egress_port.id][transmission_var.name] = expression.interval_var(
-                        start=(release_time, deadline),
-                        end=(release_time, deadline),
+                        start=(effective_release_time, deadline),
+                        end=(effective_release_time, deadline),
                         size=egress_port.get_inter_frame_gap(),
                         optional=False,
                         name='inter-frame_gap_port_{}_stream_{}_frame_{}'.format(egress_port.id, stream.id, frame)
@@ -84,8 +85,8 @@ class CpVariables:
                     for queue in range(0, network.min_queues_available - 1):
                         self.queuing[egress_port.id][queue].append(
                             expression.interval_var(
-                                start=(release_time, deadline),
-                                end=(release_time, deadline),
+                                start=(effective_release_time, deadline),
+                                end=(effective_release_time, deadline),
                                 optional=True,
                                 name='queuing_port_{}_stream_{}_frame_{}_queue_{}'.format(egress_port.id, stream.id,
                                                                                           frame, queue)

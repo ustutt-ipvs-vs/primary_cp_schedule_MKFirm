@@ -9,7 +9,7 @@ class TestNetwork(unittest.TestCase):
 
     def check_network_Devices(self, network, devices, is_switch):
         for device_id, connected_nodes in devices.items():
-            switch = network.get_node(str(device_id))
+            switch = network.get_node(device_id)
             self.assertEqual(switch.is_switch, is_switch)
             self.assertEqual(switch.processing_delay_ns, 4000 if is_switch else 0)
             self.assertEqual(switch.queues_per_port, 8)
@@ -26,7 +26,7 @@ class TestNetwork(unittest.TestCase):
         network: NetworkGraph = NetworkGraph("test_data/routing_graph_1.json")
 
         self.assertEqual(len(network.nodes), 11)
-        self.assertEqual(network.get_node_ids(), ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+        self.assertEqual(network.get_node_ids(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
         switches = {1: [0, 2, 3, 4, 10],
                     2: [1, 6, 9],
@@ -64,13 +64,13 @@ class TestNetwork(unittest.TestCase):
         self.assertRaises(ZeroDivisionError, e3.calculate_transmission_delay_in_ns_of, 12)
 
         s1: Stream = Stream(None)
-        s1.frame_size_B = 250
+        s1.frame_size_byte = 250
         self.assertEqual(e1.calculate_transmission_delay_in_ns_of(s1), 2000)
         self.assertEqual(e2.calculate_transmission_delay_in_ns_of(s1), 20000)
         self.assertRaises(ZeroDivisionError, e3.calculate_transmission_delay_in_ns_of, s1)
 
         s2: Stream = Stream(None)
-        s2.frame_size_B = 1500
+        s2.frame_size_byte = 1500
         self.assertEqual(e1.calculate_transmission_delay_in_ns_of(s2), 12000)
         self.assertEqual(e2.calculate_transmission_delay_in_ns_of(s2), 120000)
 

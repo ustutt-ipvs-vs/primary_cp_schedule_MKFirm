@@ -6,9 +6,10 @@ from scenario.scenario import Stream
 
 @dataclass
 class EgressPort:
-    id: str
-    host_node: str
-    destination_node: str
+    id: int
+    name: str
+    host_node: int
+    destination_node: int
 
     # link properties
     link_speed_mbps: int
@@ -18,9 +19,10 @@ class EgressPort:
 
     def __init__(self, json_link):
         if json_link is not None:
-            self.id = json_link['key']
-            self.host_node = json_link['source']
-            self.destination_node = json_link['target']
+            self.id = int(json_link['id'])
+            self.name = json_link['name']
+            self.host_node = int(json_link['source'])
+            self.destination_node = int(json_link['target'])
             self.link_speed_mbps = int(json_link['link_speed_mbps'])
             self.propagation_delay_ns = int(json_link['propagation_delay_ns'])
 
@@ -39,7 +41,7 @@ class EgressPort:
             return int(frame_size * 8 / self.link_speed_mbps * 10 ** 3)
 
         if isinstance(arg, Stream):
-            return computation(arg.frame_size_B)
+            return computation(arg.frame_size_byte)
         elif isinstance(arg, int):
             return computation(arg)
         else:
@@ -50,7 +52,8 @@ class EgressPort:
 
 
 class NetworkNode:
-    id: str
+    id: int
+    name: str
     processing_delay_ns: int
     queues_per_port: int
     is_switch: bool

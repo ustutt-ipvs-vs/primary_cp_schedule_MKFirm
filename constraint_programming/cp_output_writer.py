@@ -20,7 +20,10 @@ def write_result_to_json(cp_result: CpoSolveResult, parameters: CpParameters, ou
             transmissions = []
             for egress_port in parameters.routes[stream.id]:
                 transmission = get_transmission_var(stream, frame, egress_port)
-                transmission_dict = {'egress_port': egress_port.id,
+                transmission_dict = {'link_id': egress_port.id,
+                                     'link_name': egress_port.name,
+                                     'source': egress_port.host_node,
+                                     'target': egress_port.destination_node,
                                      'start': transmission.start,
                                      'end': transmission.end}
                 transmissions.append(transmission_dict)
