@@ -162,13 +162,14 @@ def planning(mdl: CpoModel, param: CpParameters) -> CpoSolveResult:
     log_verbosity = 'Quiet' if param.raw_output else 'Terse'
     warning_level = 0 if param.raw_output else 2
     mdl_sol: CpoSolveResult
-    if platform.system() == 'Windows':
-        mdl_sol = mdl.solve(TimeLimit=param.timeout, Workers=param.threads, WarningLevel=warning_level,
-                            LogVerbosity=log_verbosity)
-    else:
+    if param.cplex_executable:
         mdl_sol = mdl.solve(TimeLimit=param.timeout, Workers=param.threads, LogVerbosity=log_verbosity,
                             WarningLevel=warning_level,
-                            execfile='/home/gepperho/CPLEX_Studio221/cpoptimizer/bin/x86-64_linux/cpoptimizer')
+                            execfile=param.cplex_executable)
+    else:
+        mdl_sol = mdl.solve(TimeLimit=param.timeout, Workers=param.threads, WarningLevel=warning_level,
+                            LogVerbosity=log_verbosity)
+
     end_solving_time = time.time()
 
     if param.verbose:

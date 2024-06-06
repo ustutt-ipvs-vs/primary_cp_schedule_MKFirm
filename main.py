@@ -17,6 +17,7 @@ parser.add_argument("-v", "--verbose", help="print a lot of debug outputs. Is ov
 parser.add_argument("--raw-output", help="If set, the output will be in a raw format. Overwrites the verbose flag.",
                     action='store_true')
 parser.add_argument("-o", "--output", type=str, help="Path to the output file", default='transmission_output.json')
+parser.add_argument("--cplex", type=str, help="Path to cplex executable", default=None)
 
 args = parser.parse_args()
 raw_output = args.raw_output
@@ -29,7 +30,8 @@ candidate_routes = Routing.compute_candidate_routes(network=network, scenario=sc
 
 timelimit = args.timelimit if args.timelimit > 0 else None
 parameters = cp_structs.CpParameters(network=network, scenario=scenario, routes=candidate_routes, timeout=timelimit,
-                                     threads=args.threads, verbose=verbose, raw_output=raw_output)
+                                     threads=args.threads, verbose=verbose, raw_output=raw_output,
+                                     cplex_executable=args.cplex)
 result = cp_solver.solve_scheduling(parameters)
 
 if '/' in str(args.output) and not os.path.isdir(os.path.basename(args.output)):
