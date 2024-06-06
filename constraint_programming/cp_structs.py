@@ -26,12 +26,12 @@ class CpParameters:
 @dataclass
 class CpVariables:
     """Variables for the constraint programming model."""
-    pcp: Dict[int, Any]  # int variable for the streams pcp value
-    transmission_windows: Dict[int, List[Any]]  # key: egress_port, value: interval variables
-    inter_frame_gaps: Dict[
-        int, Dict[int, Any]]  # key: egress_port -> transmission, value: interval variables for inter-frame gap
-    queuing: Dict[
-        int, List[List[Any]]]  # key: egress_port, value: list for each queue (pcp), in list: list of interval variables
+    pcp: Dict[int, CpoIntVar]  # int variable for the streams pcp value
+    transmission_windows: Dict[int, List[CpoIntervalVar]]  # key: egress_port, value: interval variables
+    inter_frame_gaps: Dict[int, Dict[
+        int, CpoIntervalVar]]  # key: egress_port -> transmission, value: interval variables for inter-frame gap
+    queuing: Dict[int, List[List[
+        CpoIntervalVar]]]  # key: egress_port, value: list for each queue (pcp), in list: list of interval variables
 
     def __init__(self, network: NetworkGraph, scenario: Scenario, routes: Dict[int, List[EgressPort]]):
 
