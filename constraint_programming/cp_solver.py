@@ -40,7 +40,7 @@ def create_link_precedence_constraints(mdl: CpoModel, var: CpVariables, param: C
             for hop in range(1, len(param.routes[stream.id])):
                 last_hop: EgressPort = param.routes[stream.id][hop - 1]
                 current_hop: EgressPort = param.routes[stream.id][hop]
-                processing_delay: int = param.network.get_node(last_hop.host_node).processing_delay_ns
+                processing_delay: int = param.network.get_node(current_hop.host_node).processing_delay_ns
                 last_hop_var = var.get_transmission_var(last_hop, stream, frame)
                 current_hop_var = var.get_transmission_var(current_hop, stream, frame)
                 mdl.add_constraint(end_before_start(last_hop_var, current_hop_var,
@@ -70,6 +70,8 @@ def create_transmission_isolation_constraints(mdl: CpoModel, var: CpVariables, p
 
             # transmissions and inter-frame gaps cannot overlap
             variables = var.transmission_windows[egress_port.id] + list(var.inter_frame_gaps[egress_port.id].values())
+            # TODO: Instead of using inter_frame_gap variables i think it's preferable to fill the distance_matrix
+            #  of the no_overlap function here
             if len(variables) > 1:
                 mdl.add_constraint(no_overlap(variables))
 
@@ -139,6 +141,7 @@ def optimization_goal(mdl: CpoModel, var: CpVariables, param: CpParameters):
     """
     Minimize the maximum end-to-end delay.
     Note that it is fine to minmax the e2e delay for the first frame of each stream, since we have a zero-jitter constraint.
+    TODO: Is it? The start of the second frame could be be way earlier leading to a greater e2e delay?
     """
     end_to_end_delays = []
     for stream in param.scenario.streams:
