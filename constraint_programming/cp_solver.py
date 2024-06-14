@@ -72,6 +72,7 @@ def create_transmission_isolation_constraints(mdl: CpoModel, var: CpVariables, p
             variables = var.transmission_windows[egress_port.id] + list(var.inter_frame_gaps[egress_port.id].values())
             # TODO: Instead of using inter_frame_gap variables i think it's preferable to fill the distance_matrix
             #  of the no_overlap function here
+            # distance_matrix only works with interval_var_list, not with our list of interval_var.
             if len(variables) > 1:
                 mdl.add_constraint(no_overlap(variables))
 
@@ -140,19 +141,19 @@ def create_constraints_linking_pcp_to_queuing(mdl: CpoModel, var: CpVariables, p
 def optimization_goal(mdl: CpoModel, var: CpVariables, param: CpParameters):
     """
     Minimize the maximum end-to-end delay.
-    Note that it is fine to minmax the e2e delay for the first frame of each stream, since we have a zero-jitter constraint.
-    TODO: Is it? The start of the second frame could be be way earlier leading to a greater e2e delay?
     """
     end_to_end_delays = []
     for stream in param.scenario.streams:
         first_hop = param.routes[stream.id][0]
         last_hop = param.routes[stream.id][-1]
-        first_transmission = var.get_transmission_var(hop=first_hop, stream=stream, frame=0)
-        last_transmission = var.get_transmission_var(hop=last_hop, stream=stream, frame=0)
-        end_to_end = interval_var(start=first_transmission.start, end=last_transmission.end, optional=False,
-                                  name="end_to_end_delay_stream_{}".format(stream.id))
-        mdl.add_constraint(span(end_to_end, [first_transmission, last_transmission]))
-        end_to_end_delays.append(end_to_end)
+
+        for frame in Util.iterate_frames_per_hc(stream, param.scenario.hyper_cycle):
+            first_transmission = var.get_transmission_var(hop=first_hop, stream=stream, frame=frame)
+            last_transmission = var.get_transmission_var(hop=last_hop, stream=stream, frame=frame)
+            end_to_end = interval_var(start=first_transmission.start, end=last_transmission.end, optional=False,
+                                      name="end_to_end_delay_stream_{}".format(stream.id))
+            mdl.add_constraint(span(end_to_end, [first_transmission, last_transmission]))
+            end_to_end_delays.append(end_to_end)
 
     mdl.minimize(max([length_of(v) for v in end_to_end_delays]))
 

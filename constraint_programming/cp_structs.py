@@ -20,7 +20,7 @@ class CpParameters:
     threads: int
     verbose: bool
     raw_output: bool
-    cplex_executable: str
+    cplex_executable: str = None
 
 
 @dataclass
