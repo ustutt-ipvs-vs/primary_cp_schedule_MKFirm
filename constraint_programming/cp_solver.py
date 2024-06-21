@@ -151,8 +151,11 @@ def optimization_goal(mdl: CpoModel, var: CpVariables, param: CpParameters):
             first_transmission = var.get_transmission_var(hop=first_hop, stream=stream, frame=frame)
             last_transmission = var.get_transmission_var(hop=last_hop, stream=stream, frame=frame)
             end_to_end = interval_var(start=first_transmission.start, end=last_transmission.end, optional=False,
-                                      name="end_to_end_delay_stream_{}".format(stream.id))
-            mdl.add_constraint(span(end_to_end, [first_transmission, last_transmission]))
+                                      name="end_to_end_delay_stream_{}_frame_{}".format(stream.id, frame))
+            # in case first_hop == last_hop, we only need to add the transmission_var once
+            # (special case for single-hop streams)
+            mdl.add_constraint(span(end_to_end, [first_transmission, last_transmission] if first_hop != last_hop else [
+                first_transmission]))
             end_to_end_delays.append(end_to_end)
 
     mdl.minimize(max([length_of(v) for v in end_to_end_delays]))
