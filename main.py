@@ -36,4 +36,6 @@ result = cp_solver.solve_scheduling(parameters)
 
 if '/' in str(args.output) and not os.path.isdir(os.path.basename(args.output)):
     os.makedirs(os.path.basename(args.output), exist_ok=True)
-write_result_to_json(result, parameters, args.output)
+    
+if result.is_solution():
+    write_result_to_json(result, parameters, args.output)
