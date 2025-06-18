@@ -7,8 +7,8 @@ from network.network_graph import NetworkGraph
 from scenario.scenario import Scenario
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-n", "--network", type=str, help="Path to the network graph file")
-parser.add_argument("-s", "--scenario", type=str, help="Path to the flow scenario file")
+parser.add_argument("-n", "--network", type=str, help="Path to the network graph file", required=True)
+parser.add_argument("-s", "--scenario", type=str, help="Path to the flow scenario file", required=True)
 parser.add_argument("-t", "--timelimit", type=int,
                     help="solver time limit in seconds. Use negative values for unlimited.", default=120)
 parser.add_argument("--threads", type=int, help="Number of threads to be used at most", default=4)
