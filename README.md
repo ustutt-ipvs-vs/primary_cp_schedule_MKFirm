@@ -2,6 +2,8 @@
 
 Constraint programming based scheduler for time-sensitive networks (TSN) using CPLEX.
 
+This repository is part of the paper _An (m, k)-firm Elevation Policy for Weakly Hard  Real-Time in Converged 5G-TSN Networks_.
+For more context please refer to this document: https://doi.org/10.5281/zenodo.19224732
 
 When using this code, please cite:
 
