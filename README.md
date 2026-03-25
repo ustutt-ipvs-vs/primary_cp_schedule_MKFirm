@@ -6,9 +6,6 @@ Constraint programming based scheduler for time-sensitive networks (TSN) using C
 When using this code, please cite:
 
 **TODO add reference to our paper**
-```
-
-```
 
 ## Requirements
 - Python (tested with 3.10)
