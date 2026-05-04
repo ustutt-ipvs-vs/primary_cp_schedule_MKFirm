@@ -44,6 +44,4 @@ python main.py -n dummy_data/small_graph.json -s dummy_data/small_scenario.json 
 
 ### Input Data
 
-To get more input data, you can use the generation scripts in our adjacent repository ([here]()**TODO add link**).
-
 Inputs files must adhere the format from the generation scripts. Example files are provided in the `dummy_data` folder.
